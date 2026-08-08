@@ -16,6 +16,7 @@ A 3D interactive music library experience built with Three.js and TypeScript.
 - TypeScript
 - React
 - Three.js
+- FFmpeg
 - Spring boot (planned)
 - AWS (planned)
 
