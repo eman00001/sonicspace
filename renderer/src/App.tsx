@@ -1,7 +1,7 @@
 import { Canvas, useThree } from "@react-three/fiber";
 import './App.css';
-import { Store_1 } from "./models/scenes/Store_1";
-import { RecordCover, Record } from "./models/objects/Records";
+import { Store_1 } from "./components/environments/Stores";
+import { RecordCover, Record } from "./components/objects/Records";
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
