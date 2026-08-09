@@ -1,5 +1,5 @@
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import './App.css';
+import { Canvas, useThree} from "@react-three/fiber";
+import './Scene.css';
 import { Store_1 } from "./components/environments/Stores";
 import { CONSTANTS } from "./constants/constants";
 import { RecordCover, Record } from "./components/objects/Records";
@@ -9,9 +9,6 @@ import * as THREE from "three";
 
 function WallsAndFloor() {
   const { viewport, size } = useThree();
-
-  
-
   var size_x = size.width/100 * CONSTANTS.ROOM_X_SCALE;
   var size_y = CONSTANTS.ROOM_Y;
   var size_z = viewport.width * CONSTANTS.ROOM_Z_SCALE;
@@ -68,7 +65,7 @@ function CameraHelper() {
   return null;
 }
 
-function App() {
+function Scene() {
 
   
 
@@ -97,4 +94,4 @@ function App() {
   )
 }
 
-export default App
+export default Scene
