@@ -1,0 +1,9 @@
+export const CONSTANTS = {
+    BACK_WALL_Z_OFFSET: -3.7,
+    ROOM_Y: 7.4,
+    ROOM_X_SCALE: 0.7,
+    ROOM_Z_SCALE: 1.1,
+    ROOM_Y_OFFSET: 0.76,
+    WINDOW_BREAKPOINT: 5.8,
+    WALL_DEPTH: 2,
+};

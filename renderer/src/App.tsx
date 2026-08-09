@@ -1,6 +1,7 @@
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import './App.css';
 import { Store_1 } from "./components/environments/Stores";
+import { CONSTANTS } from "./constants/constants";
 import { RecordCover, Record } from "./components/objects/Records";
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useMemo } from "react";
@@ -11,9 +12,9 @@ function WallsAndFloor() {
 
   
 
-  var size_x = size.width/100 * 0.7;
-  var size_y = 7.4;
-  var size_z = viewport.width * 1.1;
+  var size_x = size.width/100 * CONSTANTS.ROOM_X_SCALE;
+  var size_y = CONSTANTS.ROOM_Y;
+  var size_z = viewport.width * CONSTANTS.ROOM_Z_SCALE;
 
   const wfmaterials = useMemo(() => [
     new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
@@ -24,16 +25,16 @@ function WallsAndFloor() {
     new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
   ], []);
 
-  if (size_x < 5.8) {
+  if (size_x < CONSTANTS.WINDOW_BREAKPOINT) {
     return (
-      <mesh material={wfmaterials} position={[0, 0.76, -3.7 + size_z / 2]}>
-        <boxGeometry args={[5.8, size_y, 6]} />
+      <mesh material={wfmaterials} position={[0, CONSTANTS.ROOM_Y_OFFSET, CONSTANTS.BACK_WALL_Z_OFFSET + size_z / 2]}>
+        <boxGeometry args={[CONSTANTS.WINDOW_BREAKPOINT, size_y, CONSTANTS.WINDOW_BREAKPOINT + 0.2]} />
       </mesh>
     );
   }
 
   return (
-      <mesh material={wfmaterials} position={[0, 0.76, -3.7 + size_z / 2]}>
+      <mesh material={wfmaterials} position={[0, CONSTANTS.ROOM_Y_OFFSET, CONSTANTS.BACK_WALL_Z_OFFSET + size_z / 2]}>
         <boxGeometry args={[size_x, size_y, size_z]} />
       </mesh>
   );
@@ -74,15 +75,10 @@ function App() {
   return (
     <Canvas shadows>
       <ambientLight intensity={0.5} />
-      {/* <directionalLight position={[5, 5, 0]} /> */}
 
       <CameraHelper />
       <Store_1 position={[0, -3, -1]} />
 
-      {/* <mesh>
-        <boxGeometry />
-        <meshStandardMaterial color="orange" />
-      </mesh> */}
       <RecordCover></RecordCover>
       <Record position={[0, 3, -1]}></Record>
       <WallsAndFloor></WallsAndFloor>
@@ -97,7 +93,6 @@ function App() {
         minAzimuthAngle={-Math.PI / 6}
         maxAzimuthAngle={Math.PI / 6}
       />
-      {/* <CameraControls  /> */}
     </Canvas>
   )
 }
