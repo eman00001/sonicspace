@@ -3,7 +3,7 @@
 A 3D interactive music library experience built with Three.js and TypeScript.
 
 ## Current Progress
--  3D environment setup [80% complete]
+-  3D environment/components setup [80% complete]
 
 <img width="2556" height="985" alt="image" src="https://github.com/user-attachments/assets/cdbde080-0572-4f6b-b7ae-d7c9edcc5979" />
 
