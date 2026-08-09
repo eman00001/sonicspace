@@ -1,4 +1,4 @@
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import './App.css';
 import { Store_1 } from "./components/environments/Stores";
 import { RecordCover, Record } from "./components/objects/Records";
@@ -7,31 +7,35 @@ import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 
 function WallsAndFloor() {
-  const { viewport } = useThree();
+  const { viewport, size } = useThree();
 
-  // 25% of the viewport width
-  const size_x = viewport.width * 1.1;
-  const size_y = viewport.height * 1.3;
+  
+
+  var size_x = size.width/100 * 0.7;
+  var size_y = 7.4;
+  var size_z = viewport.width * 1.1;
+
   const wfmaterials = useMemo(() => [
-    new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, color: "orange" }),
-    new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, color: "orange" }),
-    new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, color: "orange" }),
-    new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, color: "orange" }),
-    new THREE.MeshBasicMaterial({ visible: false }), // +Z
-    new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, color: "orange" }),
+    new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
+    new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
+    new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
+    new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
+    new THREE.MeshBasicMaterial({ visible: false }),
+    new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
   ], []);
 
-  useEffect(() => {
-    return () => {
-      wfmaterials.forEach((m) => { if ((m as any).dispose) (m as any).dispose(); });
-    };
-  }, [wfmaterials]);
+  if (size_x < 5.8) {
+    return (
+      <mesh material={wfmaterials} position={[0, 0.76, -3.7 + size_z / 2]}>
+        <boxGeometry args={[5.8, size_y, 6]} />
+      </mesh>
+    );
+  }
 
   return (
-    <mesh material={wfmaterials} position={[0, 0, -1]}>
-      <boxGeometry args={[size_x, size_y, 6]} />
-      {/* <meshStandardMaterial color="orange" /> */}
-    </mesh>
+      <mesh material={wfmaterials} position={[0, 0.76, -3.7 + size_z / 2]}>
+        <boxGeometry args={[size_x, size_y, size_z]} />
+      </mesh>
   );
 }
 
