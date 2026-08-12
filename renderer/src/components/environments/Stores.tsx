@@ -29,7 +29,7 @@ export function Store_1(props: React.JSX.IntrinsicElements['group']) {
       <PerspectiveCamera makeDefault={true} far={1000} near={0.1} fov={25} position={[0, 4, 13]}  />
       <pointLight intensity={50} decay={2} position={[0, 5.981, 0]} rotation={[-Math.PI / 2, 0, 0]} />
       <mesh geometry={nodes.Cube001.geometry} material={materials['Material.003']} position={[-0.686, 4.145, -2.806]} scale={[1.554, 1.177, 0.077]} receiveShadow/>
-      <mesh geometry={nodes.Cube002.geometry} material={materials['Material.001']} position={[-0.686, 1.2, -1.973]} scale={[1.554, 1.177, 0.582]} receiveShadow/>
+      <mesh geometry={nodes.Cube002.geometry} material={materials['Material.001']} position={[-0.686, 1.2, -1.973]} scale={[1.854, 1.177, 0.582]} receiveShadow/>
     </group>
   )
 }

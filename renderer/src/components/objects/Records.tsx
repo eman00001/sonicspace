@@ -39,40 +39,58 @@ export const RecordSquare: React.FC<RecordSquareProps> = ({
   );
 };
 
-interface RecordSetProps {
-  count: number;
-  bottom: number;
-  left: number;
-  back: number;
-  coverPaths: string[];
-  squareSize?: [number, number, number];
-}
+// interface RecordSetProps {
+//   count: number;
+//   bottom: number;
+//   left: number;
+//   back: number;
+//   coverPaths: string[];
+//   squareSize?: [number, number, number];
+// }
 
-export const RecordSet: React.FC<RecordSetProps> = ({
-  count,
-  coverPaths,
-  squareSize = [1.2, 1.2, 0.05],
-  bottom,
-  left,
-  back,
-}) => {
-  return (
-    <>
-      {Array.from({ length: count }, (_, index) => (
-        <RecordSquare
-          key={index}
-          position={[left, bottom, back + (0.1 * index)]}
-          rotation={[-Math.PI / 12, 0, 0]}
-          squareSize={squareSize}
-          texturePath={coverPaths[index]}
-        />
-      ))}
-    </>
-  );
-};
+// export const RecordSet: React.FC<RecordSetProps> = ({
+//   count,
+//   coverPaths,
+//   squareSize = [1.2, 1.2, 0.05],
+//   bottom,
+//   left,
+//   back,
+// }) => {
+//   return (
+//     <>
+//       {Array.from({ length: count }, (_, index) => (
+//         <RecordSquare
+//           key={index}
+//           position={[left, bottom, back + (0.1 * index)]}
+//           rotation={[-Math.PI / 12, 0, 0]}
+//           squareSize={squareSize}
+//           texturePath={coverPaths[index]}
+//         />
+//       ))}
+//     </>
+//   );
+// };
+
+// export const RecordColumns: React.FC<RecordLayerProps> = ({
+//   recordColumns,
+//   position = [0, 0, 0],
+// }) => {
+//   return (
+//     <>
+//       {recordColumns.map((recordSet, index) => (
+//         <group
+//           key={index}
+//           position={position}
+//         >
+//           <RecordSet {...recordSet} />
+//         </group>
+//       ))}
+//     </>
+//   );
+// };
 
 interface RecordLayerProps {
-  recordColumns: RecordSetProps[];
+  recordColumns: RecordSquareProps[];
   position?: [number, number, number];
 }
 
