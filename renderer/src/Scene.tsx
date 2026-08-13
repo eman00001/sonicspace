@@ -4,6 +4,7 @@ import './Scene.css';
 import { Store_1 } from "./components/environments/Stores";
 // import { CONSTANTS } from "./constants/constants";
 import { RecordSquare, RecordDisc} from "./components/objects/Records";
+import RecordViewer from './components/ui/RecordViewer';
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
@@ -94,7 +95,9 @@ function Scene() {
   // provide one image path per cover (served from public/)
   const coverPaths = Array.from({ length: recordSquareCount }, (_, i) => `https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/03/7f/ef/037fef16-46d5-f338-62e2-e974342d5be2/artwork.jpg/1000x1000bb.jpg`);
   // const textures = useTexture(coverPaths);
-  const [overlay, setOverlay] = useState<null | 'square' | 'disc'>(null);
+  const [overlay, setOverlay] = useState<null | { type: 'square' | 'disc'; texture?: string }>(null);
+  const lastInteractionStartedInside = React.useRef(false);
+  const lastInteractionWasDrag = React.useRef(false);
   const recordSquares: React.ReactNode[] = [];
 
   for (let i = 0; i < recordSquareLayerCount; i++) {
@@ -121,7 +124,7 @@ function Scene() {
             rotation={[-Math.PI / 9, 0, 0]}
             squareSize={squareSize}
             texturePath={coverPaths[index]}
-            onClick={() => setOverlay('square')}
+            onClick={() => setOverlay({ type: 'square', texture: coverPaths[index] })}
           />
         );
       }
@@ -135,7 +138,7 @@ function Scene() {
           position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
           rotation={[-Math.PI / 12, 0, 0]}
           texturePath={'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/03/7f/ef/037fef16-46d5-f338-62e2-e974342d5be2/artwork.jpg/1000x1000bb.jpg'}
-          onClick={() => setOverlay('disc')}
+          onClick={() => setOverlay({ type: 'disc', texture: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/03/7f/ef/037fef16-46d5-f338-62e2-e974342d5be2/artwork.jpg/1000x1000bb.jpg' })}
         />
       );
     }
@@ -168,13 +171,22 @@ function Scene() {
       </Canvas>
 
       {overlay && (
-        <div className="overlay" onClick={() => setOverlay(null)}>
+        <div className="overlay" onClick={() => {
+          // ignore closing if last interaction started inside viewer or was a drag
+          if (lastInteractionStartedInside.current || lastInteractionWasDrag.current) {
+            lastInteractionStartedInside.current = false;
+            lastInteractionWasDrag.current = false;
+            return;
+          }
+          setOverlay(null);
+        }}>
           <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
-            {overlay === 'square' ? (
-              <div className="blue-square" />
-            ) : (
-              <div className="blue-circle" />
-            )}
+            <RecordViewer
+              texture={overlay.texture}
+              onClose={() => setOverlay(null)}
+              onInteractionStart={() => { lastInteractionStartedInside.current = true; lastInteractionWasDrag.current = false; }}
+              onInteractionEnd={(wasDrag) => { lastInteractionWasDrag.current = wasDrag; }}
+            />
           </div>
         </div>
       )}
