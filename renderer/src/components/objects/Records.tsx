@@ -34,6 +34,14 @@ export const RecordSquare: React.FC<RecordProps> = ({
     [squareSize]
   );
 
+  const edges = useMemo(() => new THREE.EdgesGeometry(geom), [geom]);
+
+  useEffect(() => {
+    return () => {
+      edges.dispose();
+    };
+  }, [edges]);
+
   const meshRef = useRef<THREE.Mesh | null>(null);
   const [hovered, setHovered] = useState(false);
   const baseY = useMemo(() => position[1], [position]);
@@ -55,19 +63,26 @@ export const RecordSquare: React.FC<RecordProps> = ({
       {...props}
     >
       <meshStandardMaterial map={coverTexture} />
+      {hovered && (
+        <lineSegments geometry={edges} raycast={() => null}>
+          <lineBasicMaterial color={'#39ff14'} toneMapped={false} />
+        </lineSegments>
+      )}
     </mesh>
   );
 };
 
 export const RecordDisc: React.FC<RecordProps> = ({
   position = [0, 0, 0],
-  rotation = [0, 0, 0],
+  rotation = [Math.PI/2, 0, 0],
   recordColor = '#000',
   recordRadius = 0.5,
   recordThickness = 0.02,
+  texturePath = '',
   ...props
 }) => {
-  const geom = useMemo(() => new THREE.CylinderGeometry(recordRadius, recordRadius, recordThickness, 64), [recordRadius, recordThickness]);
+  const coverTexture = useTexture(texturePath);
+  const geom = useMemo(() => new THREE.RingGeometry(0.05, 0.6, 64), [recordRadius, recordThickness]);
   const mat = useMemo(() => new THREE.MeshStandardMaterial({ color: recordColor, metalness: 0.6, roughness: 0.25 }), [recordColor]);
   const meshRef = useRef<THREE.Mesh | null>(null);
   const [hovered, setHovered] = useState(false);
@@ -75,7 +90,7 @@ export const RecordDisc: React.FC<RecordProps> = ({
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
-    const targetY = hovered ? baseY + yOffset : baseY;
+    const targetY = hovered ? baseY + yOffset - 0.05 : baseY;
     meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, targetY, Math.min(1, 6 * delta));
   });
 
@@ -87,23 +102,39 @@ export const RecordDisc: React.FC<RecordProps> = ({
     };
   }, [geom, mat]);
 
+  const edges = useMemo(() => new THREE.EdgesGeometry(geom), [geom]);
+
+  useEffect(() => {
+    return () => {
+      edges.dispose();
+    };
+  }, [edges]);
+
   return (
     <mesh
       ref={meshRef}
       geometry={geom}
-      material={mat}
+      // material={mat}
       position={position}
-      rotation={[Math.PI / 2, 0, 0]}
+      rotation={rotation}
       onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
       onPointerOut={(e) => { e.stopPropagation(); setHovered(false); }}
       {...props}
       castShadow
     >
+      <meshStandardMaterial map={coverTexture} metalness={0.1} roughness={0.9} />
+
       {/* small center label */}
-      <mesh castShadow position={[0, 0, recordThickness / 2 + 0.001]} rotation={[0, 0, 0]} >
-        <cylinderGeometry args={[0.08, 0.08, 0.002, 32]} />
-        <meshStandardMaterial color={'#e5e5e5'} metalness={0.1} roughness={0.9} />
+      <mesh castShadow position={[0, 0, recordThickness / 2 + 0.001]} rotation={[0, 0, 0]} raycast={() => null}>
+        <ringGeometry args={[0.25, 0.6, 32]} />
+        <meshStandardMaterial color={'#000'} metalness={0.1} roughness={0.9} />
+        {hovered && (
+          <lineSegments geometry={edges} raycast={() => null}>
+            <lineBasicMaterial color={'#39ff14'} toneMapped={false} />
+          </lineSegments>
+        )}
       </mesh>
+      
     </mesh>
   );
 };

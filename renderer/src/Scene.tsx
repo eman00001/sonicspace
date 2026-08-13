@@ -1,10 +1,11 @@
+import React from 'react';
 import { Canvas, useThree} from "@react-three/fiber";
 import './Scene.css';
 import { Store_1 } from "./components/environments/Stores";
 // import { CONSTANTS } from "./constants/constants";
 import { RecordSquare, RecordDisc} from "./components/objects/Records";
 import { OrbitControls } from "@react-three/drei";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 
 var CONSTANTS = {
@@ -19,8 +20,8 @@ var CONSTANTS = {
     FLOOR_SHELF_COLUMN_SPACING: 1.25,
     FLOOR_SHELF_BACK: -3.3,
     FLOOR_SHELF_LEFT: -1.7,
-    FLOOR_SHELF_UPPER_BOTTOM: -1.2,
-    FLOOR_SHELF_LOWER_BOTTOM: -2.4,
+    FLOOR_SHELF_UPPER_BOTTOM: -0.35,
+    FLOOR_SHELF_LOWER_BOTTOM: -3.2,
     WALL_DEPTH: 2,
 };
 
@@ -84,8 +85,8 @@ function CameraHelper() {
 
 function Scene() {
   // hard code for now but can be dynamic later if shelf size is dynamic
-  const recordSquareCount = 34;
-  const recordSquareRowCount = 8;
+  const recordSquareCount = 47;
+  const recordSquareRowCount = 6;
   const recordSquareColumnCount = Math.floor(CONSTANTS.SHELF_LENGTH/1.2);
   const recordSquareLayerCount = 2;
   const squareSize: [number, number, number] = [1.2, 1.2, 0.05];
@@ -93,7 +94,7 @@ function Scene() {
   // provide one image path per cover (served from public/)
   const coverPaths = Array.from({ length: recordSquareCount }, (_, i) => `https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/03/7f/ef/037fef16-46d5-f338-62e2-e974342d5be2/artwork.jpg/1000x1000bb.jpg`);
   // const textures = useTexture(coverPaths);
-  var done = false;
+  const [overlay, setOverlay] = useState<null | 'square' | 'disc'>(null);
   const recordSquares: React.ReactNode[] = [];
 
   for (let i = 0; i < recordSquareLayerCount; i++) {
@@ -114,28 +115,44 @@ function Scene() {
             key={index}
             position={[
               -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
-              CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
-              -3.3 + 0.15 * k
+              i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
+              -3.3 + (0.22 * k)
             ]}
-            rotation={[-Math.PI / 12, 0, 0]}
+            rotation={[-Math.PI / 9, 0, 0]}
             squareSize={squareSize}
             texturePath={coverPaths[index]}
+            onClick={() => setOverlay('square')}
           />
         );
       }
     }
   }
-  
+  const recordDiscs: React.ReactNode[] = [];
+  for (let i = 0; i < 2; i++) {
+    for (let j = 0; j < 3; j++) {
+      recordDiscs.push(
+        <RecordDisc
+          position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
+          rotation={[-Math.PI / 12, 0, 0]}
+          texturePath={'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/03/7f/ef/037fef16-46d5-f338-62e2-e974342d5be2/artwork.jpg/1000x1000bb.jpg'}
+          onClick={() => setOverlay('disc')}
+        />
+      );
+    }
+    
+  }
 
   return (
-    <Canvas shadows>
+    <div className="scene-container" style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <Canvas shadows>
       <ambientLight intensity={0.5} />
 
       <CameraHelper />
       <Store_1 position={[0, -3, -1]} />
 
+      {recordDiscs}
       {recordSquares}
-      <RecordDisc position={[-1.6, 1.75, -3.5]} rotation={[-Math.PI / 12, 0, 0]}></RecordDisc>
+
       <WallsAndFloor></WallsAndFloor>
       <OrbitControls  
         target={[0, 0, 0]}
@@ -148,8 +165,21 @@ function Scene() {
         minAzimuthAngle={-Math.PI / 6}
         maxAzimuthAngle={Math.PI / 6}
       />
-    </Canvas>
-  )
+      </Canvas>
+
+      {overlay && (
+        <div className="overlay" onClick={() => setOverlay(null)}>
+          <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
+            {overlay === 'square' ? (
+              <div className="blue-square" />
+            ) : (
+              <div className="blue-circle" />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default Scene
