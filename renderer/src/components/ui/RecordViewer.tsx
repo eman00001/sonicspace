@@ -1,32 +1,49 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 
-interface Props {
+interface RecordInfo {
+  title?: string;
+  artist?: string;
   texture?: string | null;
+}
+
+interface Props {
+  record?: RecordInfo;
   onClose?: () => void;
   onInteractionStart?: () => void;
   onInteractionEnd?: (wasDrag: boolean) => void;
 }
 
-export default function RecordViewer({ texture, onClose, onInteractionStart, onInteractionEnd }: Props) {
+export default function RecordViewer({ record, onClose, onInteractionStart, onInteractionEnd }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [entered, setEntered] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setEntered(true), 10);
-    return () => clearTimeout(t);
-  }, []);
+  const texture = record?.texture ?? null;
 
   return (
     <div className="record-viewer" role="dialog" aria-modal="true" ref={containerRef}>
-      <Canvas style={{ width: 480, height: 480 }} camera={{ position: [-1, 0, 3], fov: 60 }}>
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 5, 5]} intensity={0.8} />
-        <ViewerScene texture={texture} onInteractionStart={onInteractionStart} onInteractionEnd={onInteractionEnd} />
-      </Canvas>
-
       <button className="rv-close" onClick={onClose} aria-label="close">✕</button>
+
+      <div className="record-viewer-content">
+        <div className="record-visual">
+          <Canvas camera={{ position: [-1, 0, 3], fov: 60 }}>
+            <ambientLight intensity={0.6} />
+            <directionalLight position={[5, 5, 5]} intensity={0.8} />
+            <ViewerScene texture={texture} onInteractionStart={onInteractionStart} onInteractionEnd={onInteractionEnd} />
+          </Canvas>
+        </div>
+
+        <div className="record-info-panel">
+          <div className="record-meta">
+            <span className="record-kicker">Now playing</span>
+            <h2>{record?.title ?? 'Untitled Record'}</h2>
+            <p>{record?.artist ?? 'Unknown Artist'}</p>
+          </div>
+
+          <div className="record-slider-container">
+            <input type="range" min={0} max={100} defaultValue={35} aria-label="Adjust view" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -111,13 +128,11 @@ function ViewerScene({ texture, onInteractionStart, onInteractionEnd }: { textur
     try { onInteractionStart && onInteractionStart(); } catch (e) {}
   }
 
-  const squareSize = 1.2;
   const discOffset = 0.1; // how much disc pops out
 
   // local sizes (bigger)
   const bigSquare = 2.2;
   const discRadius = 1.0;
-  const discThickness = 0.06;
   const spinSpeed = 2.0; // radians per second
   const emergence = useRef({ t: 0 });
 

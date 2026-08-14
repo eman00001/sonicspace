@@ -16,6 +16,8 @@ interface RecordProps extends MeshProps {
   texturePath?: string;
   recordRadius?: number;
   recordThickness?: number;
+  title?: string;
+  artist?: string;
 }
 
 const yOffset = 0.15;
