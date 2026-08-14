@@ -3,11 +3,11 @@ import { Canvas, useThree} from "@react-three/fiber";
 import './Scene.css';
 import { Store_1 } from "./components/environments/Stores";
 // import { CONSTANTS } from "./constants/constants";
-import { RecordSquare, RecordDisc} from "./components/objects/Records";
+import { EmptySquare, EmptyDisc, RecordSquare, RecordDisc} from "./components/objects/Records";
 import RecordViewer from './components/ui/RecordViewer';
 import AddSongs from './components/ui/AddSongs';
 import { OrbitControls } from "@react-three/drei";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import * as THREE from "three";
 
 var CONSTANTS = {
@@ -33,14 +33,14 @@ function WallsAndFloor() {
   var size_y = CONSTANTS.ROOM_Y;
   var size_z = viewport.width * CONSTANTS.ROOM_Z_SCALE;
 
-  const wfmaterials = useMemo(() => [
+  const wfmaterials = [
     new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
     new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
     new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
     new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
     new THREE.MeshBasicMaterial({ visible: false }),
     new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: "orange" }),
-  ], []);
+  ];
 
   if (size_x < CONSTANTS.WINDOW_BREAKPOINT) {
     return (
@@ -57,37 +57,10 @@ function WallsAndFloor() {
   );
 }
 
-function CameraHelper() {
-  const { camera, scene } = useThree();
-
-  useEffect(() => {
-    const helper = new THREE.CameraHelper(camera);
-    scene.add(helper);
-
-    return () => {
-      scene.remove(helper);
-      // dispose helper resources if present
-      try {
-        // @ts-ignore
-        helper.geometry?.dispose?.();
-        // @ts-ignore
-        if (Array.isArray((helper as any).material)) {
-          (helper as any).material.forEach((m: any) => m?.dispose && m.dispose());
-        } else {
-          (helper as any).material?.dispose?.();
-        }
-      } catch (e) {
-        // ignore disposal errors
-      }
-    };
-  }, [camera, scene]);
-
-  return null;
-}
-
 function Scene() {
   // hard code for now but can be dynamic later if shelf size is dynamic
   const recordSquareCount = 47;
+  const recordDiscCount = 3;
   const recordSquareRowCount = 6;
   const recordSquareColumnCount = Math.floor(CONSTANTS.SHELF_LENGTH/1.2);
   const recordSquareLayerCount = 2;
@@ -120,6 +93,19 @@ function Scene() {
           k;
 
         if (index >= recordSquareCount) {
+          recordSquares.push(
+            <EmptySquare
+              key={index}
+              position={[
+                -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
+                i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
+                -3.3 + (0.22 * k)
+              ]}
+              rotation={[-Math.PI / 9, 0, 0]}
+              squareSize={squareSize}
+              onClick={() => setAddSongsOpen(false)}
+            />
+          );
           break;
         }
 
@@ -155,8 +141,33 @@ function Scene() {
   const recordDiscs: React.ReactNode[] = [];
   for (let i = 0; i < 2; i++) {
     for (let j = 0; j < 3; j++) {
+      const index = (i * 2) + j;
+
       const discTitle = `Disc ${i + 1}-${j + 1}`;
       const discArtist = 'Placeholder Artist';
+      
+
+      if (index >= recordDiscCount) {
+        recordDiscs.push(
+          <EmptyDisc
+          key={`${discTitle}-${j}`}
+          title={discTitle}
+          artist={discArtist}
+          position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
+          rotation={[-Math.PI / 12, 0, 0]}
+          texturePath={"/assets/charlotte_cover.jpg"}
+          onClick={() => setOverlay({
+            type: 'disc',
+            record: {
+              title: discTitle,
+              artist: discArtist,
+              texture: '/assets/charlotte_cover.jpg',
+            },
+          })}
+        />
+        );
+        break;
+      }
 
       recordDiscs.push(
         <RecordDisc
@@ -187,7 +198,6 @@ function Scene() {
       <Canvas shadows>
         <ambientLight intensity={0.5} />
 
-        <CameraHelper />
         <Store_1 position={[0, -3, -1]} />
 
         {recordDiscs}

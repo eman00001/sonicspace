@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
@@ -20,6 +20,17 @@ interface RecordProps extends MeshProps {
   artist?: string;
 }
 
+interface EmptyProps extends MeshProps {
+  position?: Vec3;
+  rotation?: Vec3;
+  coverColor?: string;
+  recordColor?: string;
+  squareSize?: [number, number, number];
+  texturePath?: string;
+  recordRadius?: number;
+  recordThickness?: number;
+}
+
 const yOffset = 0.15;
 
 export const RecordSquare: React.FC<RecordProps> = ({
@@ -31,12 +42,9 @@ export const RecordSquare: React.FC<RecordProps> = ({
   ...props
 }) => {
   const coverTexture = useTexture(texturePath);
-  const geom = useMemo(
-    () => new THREE.BoxGeometry(squareSize[0], squareSize[1], squareSize[2]),
-    [squareSize]
-  );
+  const geom = new THREE.BoxGeometry(squareSize[0], squareSize[1], squareSize[2]);
 
-  const edges = useMemo(() => new THREE.EdgesGeometry(geom), [geom]);
+  const edges = new THREE.EdgesGeometry(geom);
 
   useEffect(() => {
     return () => {
@@ -46,7 +54,7 @@ export const RecordSquare: React.FC<RecordProps> = ({
 
   const meshRef = useRef<THREE.Mesh | null>(null);
   const [hovered, setHovered] = useState(false);
-  const baseY = useMemo(() => position[1], [position]);
+  const baseY = position[1];
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
@@ -74,6 +82,64 @@ export const RecordSquare: React.FC<RecordProps> = ({
   );
 };
 
+export const EmptyDisc: React.FC<EmptyProps> = ({
+  position = [0, 0, 0],
+  rotation = [Math.PI/2, 0, 0],
+  recordColor = '#000',
+  recordRadius = 0.5,
+  recordThickness = 0.02,
+  ...props
+}) => {
+  var geom = new THREE.RingGeometry(0.05, 0.6, 64);
+  const edges = new THREE.EdgesGeometry();
+  return (
+    <mesh
+      geometry={geom}
+      position={position}
+      rotation={rotation}
+      castShadow
+    >
+      <meshStandardMaterial color={'#808080'} metalness={0.1} roughness={0.9} />
+
+      {/* small center label */}
+      <mesh castShadow position={[0, 0, recordThickness / 2 + 0.001]} rotation={[0, 0, 0]} raycast={() => null}>
+        <ringGeometry args={[0.25, 0.6, 32]} />
+        <meshStandardMaterial color={'#000'} metalness={0.1} roughness={0.9} />
+        <lineSegments geometry={edges} raycast={() => null}>
+          <lineBasicMaterial color={'#39ff14'} toneMapped={false} />
+        </lineSegments>
+      </mesh>
+      
+    </mesh>
+  );
+}
+
+export const EmptySquare: React.FC<EmptyProps> = ({
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  coverColor = '#111',
+  squareSize = [1.2, 1.2, 0.05],
+  ...props
+}) => {
+  const geom = new THREE.BoxGeometry(squareSize[0], squareSize[1], squareSize[2]);
+
+  const edges = new THREE.EdgesGeometry(geom);
+  return (
+    <mesh
+      geometry={geom}
+      position={position}
+      rotation={rotation}
+      {...props}
+    >
+      <meshStandardMaterial color={'#858585'} />
+
+        <lineSegments geometry={edges} raycast={() => null}>
+          <lineBasicMaterial color={'#39ff14'} toneMapped={false} />
+        </lineSegments>
+    </mesh>
+  );
+}
+
 export const RecordDisc: React.FC<RecordProps> = ({
   position = [0, 0, 0],
   rotation = [Math.PI/2, 0, 0],
@@ -84,11 +150,11 @@ export const RecordDisc: React.FC<RecordProps> = ({
   ...props
 }) => {
   const coverTexture = useTexture(texturePath);
-  const geom = useMemo(() => new THREE.RingGeometry(0.05, 0.6, 64), [recordRadius, recordThickness]);
-  const mat = useMemo(() => new THREE.MeshStandardMaterial({ color: recordColor, metalness: 0.6, roughness: 0.25 }), [recordColor]);
+  const geom = new THREE.RingGeometry(0.05, 0.6, 64);
+  const mat = new THREE.MeshStandardMaterial({ color: recordColor, metalness: 0.6, roughness: 0.25 });
   const meshRef = useRef<THREE.Mesh | null>(null);
   const [hovered, setHovered] = useState(false);
-  const baseY = useMemo(() => position[1], [position]);
+  const baseY = position[1];
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
@@ -104,7 +170,7 @@ export const RecordDisc: React.FC<RecordProps> = ({
     };
   }, [geom, mat]);
 
-  const edges = useMemo(() => new THREE.EdgesGeometry(geom), [geom]);
+  const edges = new THREE.EdgesGeometry(geom);
 
   useEffect(() => {
     return () => {
