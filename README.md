@@ -8,18 +8,18 @@ A 3D interactive music library experience built with Three.js and TypeScript.
 <!-- <img width="2559" height="952" alt="image" src="https://github.com/user-attachments/assets/7b5cef9b-88db-4b46-8306-73c74c858c7b" /> -->
 
 
--  Interactive scene rendering [in progress]
--  Music library integration [planned]
--  User interactions [planned]
--  Backend services [planned]
+-  Interactive scene rendering
+-  Music library integration [in progress]
+-  User interactions
+-  Backend services
 
 ## Tech Stack
 - TypeScript
 - React
 - Three.js
 - FFmpeg
-- Spring boot (planned)
-- AWS (planned)
+- Spring boot
+- AWS (in progress)
 
 ## Goal
 Create an immersive way to explore and interact with a personal music collection in a 3D space.
