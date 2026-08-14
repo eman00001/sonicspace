@@ -84,7 +84,7 @@ export const RecordSquare: React.FC<RecordProps> = ({
 
 export const EmptyDisc: React.FC<EmptyProps> = ({
   position = [0, 0, 0],
-  rotation = [Math.PI/2, 0, 0],
+  rotation = [0, 0, 0],
   recordColor = '#000',
   recordRadius = 0.5,
   recordThickness = 0.02,
@@ -97,6 +97,7 @@ export const EmptyDisc: React.FC<EmptyProps> = ({
       geometry={geom}
       position={position}
       rotation={rotation}
+      {...props}
       castShadow
     >
       <meshStandardMaterial color={'#808080'} metalness={0.1} roughness={0.9} />

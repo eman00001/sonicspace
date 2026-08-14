@@ -59,7 +59,7 @@ function WallsAndFloor() {
 
 function Scene() {
   // hard code for now but can be dynamic later if shelf size is dynamic
-  const recordSquareCount = 47;
+  const recordSquareCount = 42;
   const recordDiscCount = 3;
   const recordSquareRowCount = 6;
   const recordSquareColumnCount = Math.floor(CONSTANTS.SHELF_LENGTH/1.2);
@@ -93,19 +93,21 @@ function Scene() {
           k;
 
         if (index >= recordSquareCount) {
-          recordSquares.push(
-            <EmptySquare
-              key={index}
-              position={[
-                -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
-                i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
-                -3.3 + (0.22 * k)
-              ]}
-              rotation={[-Math.PI / 9, 0, 0]}
-              squareSize={squareSize}
-              onClick={() => setAddSongsOpen(false)}
-            />
-          );
+          if (index%recordSquareRowCount == 0) {
+            recordSquares.push(
+              <EmptySquare
+                key={index}
+                position={[
+                  -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
+                  i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
+                  -3.3 + (0.22 * k)
+                ]}
+                rotation={[-Math.PI / 9, 0, 0]}
+                squareSize={squareSize}
+                onClick={() => setAddSongsOpen(true)}
+              />
+            );
+          }
           break;
         }
 
@@ -154,16 +156,7 @@ function Scene() {
           title={discTitle}
           artist={discArtist}
           position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
-          rotation={[-Math.PI / 12, 0, 0]}
-          texturePath={"/assets/charlotte_cover.jpg"}
-          onClick={() => setOverlay({
-            type: 'disc',
-            record: {
-              title: discTitle,
-              artist: discArtist,
-              texture: '/assets/charlotte_cover.jpg',
-            },
-          })}
+          onClick={() => setAddSongsOpen(true)}
         />
         );
         break;
