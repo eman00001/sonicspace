@@ -1,0 +1,49 @@
+type Query {
+    me: User
+    user(id: ID!): User
+    album(id: ID!): Album
+    albums: [Album!]!
+    track(id: ID!): Track
+}
+
+type User {
+    id: ID!
+    username: String!
+    createdAt: String!
+    updatedAt: String!
+
+    albums: [Album!]!
+}
+
+type Album {
+    id: ID!
+    userId: ID!
+
+    title: String!
+    artist: String
+    coverUrl: String
+
+    createdAt: String!
+    updatedAt: String!
+
+    user: User!
+    tracks: [Track!]!
+}
+
+type Track {
+    id: ID!
+    albumId: ID!
+
+    title: String!
+    trackNumber: Int
+    duration: Float
+
+    audioUrl: String
+    originalAudioUrl: String
+
+    createdAt: String!
+    updatedAt: String!
+
+    album: Album!
+}
+
