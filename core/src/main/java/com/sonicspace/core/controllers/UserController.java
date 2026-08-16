@@ -1,6 +1,8 @@
 package com.sonicspace.core.controllers;
 
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -16,7 +18,7 @@ public class UserController {
     UserService userService;
     
     @QueryMapping
-    public User user(@Argument String id) {
+    public Optional<User> user(@Argument String id) {
         return userService.findById(id);
     }
     
