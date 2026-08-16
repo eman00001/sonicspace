@@ -116,8 +116,8 @@ export default function AddSongs({ onClose }: Props) {
         </small>
 
         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-          <button type="submit" className="add-songs-submit">Add</button>
-          <button type="button" onClick={onClose} className="add-songs-cancel">Cancel</button>
+          <button type="submit" className="btn btn-primary add-songs-submit">Add</button>
+          <button type="button" onClick={onClose} className="btn btn-ghost add-songs-cancel">Cancel</button>
         </div>
       </form>
     </div>

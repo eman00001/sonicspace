@@ -1,14 +1,16 @@
 import React from 'react';
 import { Canvas, useThree} from "@react-three/fiber";
 import './Scene.css';
+import './styles/components.css';
 import { Store_1 } from "./components/environments/Stores";
 // import { CONSTANTS } from "./constants/constants";
 import { EmptySquare, EmptyDisc, RecordSquare, RecordDisc} from "./components/objects/Records";
 import RecordViewer from './components/ui/RecordViewer';
 import AddSongs from './components/ui/AddSongs';
 import { OrbitControls } from "@react-three/drei";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import * as THREE from "three";
+import { useAuth } from "react-oidc-context";
 
 var CONSTANTS = {
     BACK_WALL_Z_OFFSET: -3.7,
@@ -58,187 +60,222 @@ function WallsAndFloor() {
 }
 
 function Scene() {
-  // hard code for now but can be dynamic later if shelf size is dynamic
-  const recordSquareCount = 42;
-  const recordDiscCount = 3;
-  const recordSquareRowCount = 6;
-  const recordSquareColumnCount = Math.floor(CONSTANTS.SHELF_LENGTH/1.2);
-  const recordSquareLayerCount = 2;
-  const squareSize: [number, number, number] = [1.2, 1.2, 0.05];
+  const auth = useAuth();
 
-  // provide one image path per cover (served from public/)
-  const coverPaths = Array.from({ length: recordSquareCount }, (_, i) => `https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/03/7f/ef/037fef16-46d5-f338-62e2-e974342d5be2/artwork.jpg/1000x1000bb.jpg`);
-  // const textures = useTexture(coverPaths);
-  type RecordOverlay = {
-    type: 'square' | 'disc';
-    record: {
-      title: string;
-      artist: string;
-      texture?: string;
-    };
+  const signOutRedirect = () => {
+    const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID;
+    const logoutUri = "<logout uri>";
+    const cognitoDomain = "https://<user pool domain>";
+    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
   };
-  const [overlay, setOverlay] = useState<null | RecordOverlay>(null);
-  const lastInteractionStartedInside = React.useRef(false);
-  const lastInteractionWasDrag = React.useRef(false);
-  const [addSongsOpen, setAddSongsOpen] = useState(false);
-  const recordSquares: React.ReactNode[] = [];
 
-  for (let i = 0; i < recordSquareLayerCount; i++) {
-    for (let j = 0; j < recordSquareColumnCount; j++) {
-      for (let k = 0; k < recordSquareRowCount; k++) {
+  if (auth.isLoading) {
+    return <div>Loading...</div>;
+  }
 
-        const index =
-          i * (recordSquareColumnCount * recordSquareRowCount) +
-          j * recordSquareRowCount +
-          k;
+  if (auth.error) {
+    return <div>Encountering error... {auth.error.message}</div>;
+  }
 
-        if (index >= recordSquareCount) {
-          if (index%recordSquareRowCount == 0) {
-            recordSquares.push(
-              <EmptySquare
-                key={index}
-                position={[
-                  -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
-                  i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
-                  -3.3 + (0.22 * k)
-                ]}
-                rotation={[-Math.PI / 9, 0, 0]}
-                squareSize={squareSize}
-                onClick={() => setAddSongsOpen(true)}
-              />
-            );
+  if (auth.isAuthenticated) {
+    // hard code for now but can be dynamic later if shelf size is dynamic
+    const recordSquareCount = 42;
+    const recordDiscCount = 3;
+    const recordSquareRowCount = 6;
+    const recordSquareColumnCount = Math.floor(CONSTANTS.SHELF_LENGTH/1.2);
+    const recordSquareLayerCount = 2;
+    const squareSize: [number, number, number] = [1.2, 1.2, 0.05];
+
+    // provide one image path per cover (served from public/)
+    const coverPaths = Array.from({ length: recordSquareCount }, (_, i) => `https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/03/7f/ef/037fef16-46d5-f338-62e2-e974342d5be2/artwork.jpg/1000x1000bb.jpg`);
+    // const textures = useTexture(coverPaths);
+    type RecordOverlay = {
+      type: 'square' | 'disc';
+      record: {
+        title: string;
+        artist: string;
+        texture?: string;
+      };
+    };
+    const [overlay, setOverlay] = useState<null | RecordOverlay>(null);
+    const lastInteractionStartedInside = React.useRef(false);
+    const lastInteractionWasDrag = React.useRef(false);
+    const [addSongsOpen, setAddSongsOpen] = useState(false);
+    const recordSquares: React.ReactNode[] = [];
+
+    for (let i = 0; i < recordSquareLayerCount; i++) {
+      for (let j = 0; j < recordSquareColumnCount; j++) {
+        for (let k = 0; k < recordSquareRowCount; k++) {
+
+          const index =
+            i * (recordSquareColumnCount * recordSquareRowCount) +
+            j * recordSquareRowCount +
+            k;
+
+          if (index >= recordSquareCount) {
+            if (index%recordSquareRowCount == 0) {
+              recordSquares.push(
+                <EmptySquare
+                  key={index}
+                  position={[
+                    -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
+                    i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
+                    -3.3 + (0.22 * k)
+                  ]}
+                  rotation={[-Math.PI / 9, 0, 0]}
+                  squareSize={squareSize}
+                  onClick={() => setAddSongsOpen(true)}
+                />
+              );
+            }
+            break;
           }
+
+          const recordTitle = `Shelf Track ${index + 1}`;
+          const recordArtist = 'Placeholder Artist';
+
+          recordSquares.push(
+            <RecordSquare
+              key={index}
+              title={recordTitle}
+              artist={recordArtist}
+              position={[
+                -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
+                i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
+                -3.3 + (0.22 * k)
+              ]}
+              rotation={[-Math.PI / 9, 0, 0]}
+              squareSize={squareSize}
+              texturePath={coverPaths[index]}
+              onClick={() => setOverlay({
+                type: 'square',
+                record: {
+                  title: recordTitle,
+                  artist: recordArtist,
+                  texture: coverPaths[index],
+                },
+              })}
+            />
+          );
+        }
+      }
+    }
+    const recordDiscs: React.ReactNode[] = [];
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 3; j++) {
+        const index = (i * 2) + j;
+
+        const discTitle = `Disc ${i + 1}-${j + 1}`;
+        const discArtist = 'Placeholder Artist';
+        
+
+        if (index >= recordDiscCount) {
+          recordDiscs.push(
+            <EmptyDisc
+            key={`${discTitle}-${j}`}
+            title={discTitle}
+            artist={discArtist}
+            position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
+            onClick={() => setAddSongsOpen(true)}
+          />
+          );
           break;
         }
 
-        const recordTitle = `Shelf Track ${index + 1}`;
-        const recordArtist = 'Placeholder Artist';
-
-        recordSquares.push(
-          <RecordSquare
-            key={index}
-            title={recordTitle}
-            artist={recordArtist}
-            position={[
-              -CONSTANTS.SHELF_LENGTH/2 + 1.2 + (j*CONSTANTS.FLOOR_SHELF_COLUMN_SPACING),
-              i==1?CONSTANTS.FLOOR_SHELF_LOWER_BOTTOM + i:CONSTANTS.FLOOR_SHELF_UPPER_BOTTOM - i,
-              -3.3 + (0.22 * k)
-            ]}
-            rotation={[-Math.PI / 9, 0, 0]}
-            squareSize={squareSize}
-            texturePath={coverPaths[index]}
+        recordDiscs.push(
+          <RecordDisc
+            key={`${discTitle}-${j}`}
+            title={discTitle}
+            artist={discArtist}
+            position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
+            rotation={[-Math.PI / 12, 0, 0]}
+            texturePath={"/assets/charlotte_cover.jpg"}
             onClick={() => setOverlay({
-              type: 'square',
+              type: 'disc',
               record: {
-                title: recordTitle,
-                artist: recordArtist,
-                texture: coverPaths[index],
+                title: discTitle,
+                artist: discArtist,
+                texture: '/assets/charlotte_cover.jpg',
               },
             })}
           />
         );
       }
     }
-  }
-  const recordDiscs: React.ReactNode[] = [];
-  for (let i = 0; i < 2; i++) {
-    for (let j = 0; j < 3; j++) {
-      const index = (i * 2) + j;
 
-      const discTitle = `Disc ${i + 1}-${j + 1}`;
-      const discArtist = 'Placeholder Artist';
-      
+    return (
+      <div className="scene-container" style={{ width: '100%', height: '100%', position: 'relative' }}>
+        {!addSongsOpen && (
+          <button className="btn btn-primary add-songs-button" onClick={() => setAddSongsOpen(true)}>+ Add Songs</button>
+        )}
+        <Canvas shadows>
+          <ambientLight intensity={0.5} />
 
-      if (index >= recordDiscCount) {
-        recordDiscs.push(
-          <EmptyDisc
-          key={`${discTitle}-${j}`}
-          title={discTitle}
-          artist={discArtist}
-          position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
-          onClick={() => setAddSongsOpen(true)}
-        />
-        );
-        break;
-      }
+          <Store_1 position={[0, -3, -1]} />
 
-      recordDiscs.push(
-        <RecordDisc
-          key={`${discTitle}-${j}`}
-          title={discTitle}
-          artist={discArtist}
-          position={[-1.37 + (j*1.35), 1.55 + (i*1.35), -3.5]}
-          rotation={[-Math.PI / 12, 0, 0]}
-          texturePath={"/assets/charlotte_cover.jpg"}
-          onClick={() => setOverlay({
-            type: 'disc',
-            record: {
-              title: discTitle,
-              artist: discArtist,
-              texture: '/assets/charlotte_cover.jpg',
-            },
-          })}
-        />
-      );
-    }
+          {recordDiscs}
+          {recordSquares}
+
+          <WallsAndFloor></WallsAndFloor>
+          <OrbitControls  
+            target={[0, 0, 0]}
+            enableDamping
+            enablePan={false}
+            minDistance={4}
+            maxDistance={10}
+            minPolarAngle={Math.PI / 4}
+            maxPolarAngle={(2*Math.PI) / 4}
+            minAzimuthAngle={-Math.PI / 6}
+            maxAzimuthAngle={Math.PI / 6}
+          />
+        </Canvas>
+        <div className="overlay-content">
+          {/* <pre> Hello: {auth.user?.profile.email} </pre>
+          <pre> ID Token: {auth.user?.id_token} </pre>
+          <pre> Access Token: {auth.user?.access_token} </pre>
+          <pre> Refresh Token: {auth.user?.refresh_token} </pre> */}
+
+          <button className="btn btn-ghost" onClick={() => auth.removeUser()}>Sign out</button>
+        </div>
+        {addSongsOpen && (
+          <div className="overlay" onClick={() => setAddSongsOpen(false)}>
+            <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
+              <AddSongs onClose={() => setAddSongsOpen(false)} />
+            </div>
+          </div>
+        )}
+
+        {overlay && (
+          <div className="overlay" onClick={() => {
+            // ignore closing if last interaction started inside viewer or was a drag
+            if (lastInteractionStartedInside.current || lastInteractionWasDrag.current) {
+              lastInteractionStartedInside.current = false;
+              lastInteractionWasDrag.current = false;
+              return;
+            }
+            setOverlay(null);
+          }}>
+            <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
+              <RecordViewer
+                record={overlay.record}
+                onClose={() => setOverlay(null)}
+                onInteractionStart={() => { lastInteractionStartedInside.current = true; lastInteractionWasDrag.current = false; }}
+                onInteractionEnd={(wasDrag) => { lastInteractionWasDrag.current = wasDrag; }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (
-    <div className="scene-container" style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {!addSongsOpen && (
-        <button className="add-songs-button" onClick={() => setAddSongsOpen(true)}>+ Add Songs</button>
-      )}
-      <Canvas shadows>
-        <ambientLight intensity={0.5} />
-
-        <Store_1 position={[0, -3, -1]} />
-
-        {recordDiscs}
-        {recordSquares}
-
-        <WallsAndFloor></WallsAndFloor>
-        <OrbitControls  
-          target={[0, 0, 0]}
-          enableDamping
-          enablePan={false}
-          minDistance={4}
-          maxDistance={10}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={(2*Math.PI) / 4}
-          minAzimuthAngle={-Math.PI / 6}
-          maxAzimuthAngle={Math.PI / 6}
-        />
-      </Canvas>
-      {addSongsOpen && (
-        <div className="overlay" onClick={() => setAddSongsOpen(false)}>
-          <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
-            <AddSongs onClose={() => setAddSongsOpen(false)} />
-          </div>
-        </div>
-      )}
-
-      {overlay && (
-        <div className="overlay" onClick={() => {
-          // ignore closing if last interaction started inside viewer or was a drag
-          if (lastInteractionStartedInside.current || lastInteractionWasDrag.current) {
-            lastInteractionStartedInside.current = false;
-            lastInteractionWasDrag.current = false;
-            return;
-          }
-          setOverlay(null);
-        }}>
-          <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
-            <RecordViewer
-              record={overlay.record}
-              onClose={() => setOverlay(null)}
-              onInteractionStart={() => { lastInteractionStartedInside.current = true; lastInteractionWasDrag.current = false; }}
-              onInteractionEnd={(wasDrag) => { lastInteractionWasDrag.current = wasDrag; }}
-            />
-          </div>
-        </div>
-      )}
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <button className="btn btn-primary" onClick={() => auth.signinRedirect()}>Sign in</button>
+      <button className="btn btn-ghost" onClick={() => signOutRedirect()}>Sign out</button>
     </div>
   );
+  
 }
 
 export default Scene

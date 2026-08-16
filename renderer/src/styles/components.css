@@ -1,0 +1,60 @@
+/* Shared component styles template */
+
+/* Buttons (grayscale glassy theme) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.035);
+  background: linear-gradient(180deg, rgba(20,20,20,0.6), rgba(10,10,10,0.55));
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.32), inset 0 0.5px rgba(255,255,255,0.015);
+  backdrop-filter: blur(4px) saturate(105%);
+  transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
+}
+
+.btn:hover { transform: translateY(-1px); filter: brightness(1.035); }
+
+.btn-primary {
+  background: linear-gradient(180deg, rgba(30,30,30,0.62), rgba(8,8,8,0.5));
+  border: 1px solid rgba(255,255,255,0.035);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.36);
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+  border: 1px solid rgba(255,255,255,0.035);
+  color: #f5f5f5;
+}
+
+.btn-ghost {
+  background: rgba(255,255,255,0.012);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #eaeaea;
+}
+
+/* Viewer container placeholder */
+.viewer {
+  background: linear-gradient(180deg, rgba(20,20,20,0.85), rgba(14,14,14,0.9));
+  border-radius: 10px;
+  padding: 12px;
+}
+
+/* Drawer placeholder */
+.drawer {
+  background: #0b0b0b;
+  color: #fff;
+  border-left: 1px solid rgba(255,255,255,0.03);
+  width: 320px;
+  padding: 16px;
+}
+
+/* Utility */
+.muted { color: rgba(255,255,255,0.62); }
