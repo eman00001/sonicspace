@@ -3,7 +3,7 @@
 A 3D interactive music library experience built with Three.js and TypeScript.
 
 ## Current Progress
--  3D environment/components setup [80% complete]
+-  3D environment/components setup
 <img width="320" height="137" alt="demosonicspace" src="https://github.com/user-attachments/assets/1d5888f8-fb29-4f23-9b67-de768e9453e3" />
 <!-- <img width="2559" height="952" alt="image" src="https://github.com/user-attachments/assets/7b5cef9b-88db-4b46-8306-73c74c858c7b" /> -->
 
