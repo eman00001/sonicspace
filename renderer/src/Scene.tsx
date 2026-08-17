@@ -11,8 +11,10 @@ import { OrbitControls } from "@react-three/drei";
 import { useState } from "react";
 import * as THREE from "three";
 import { useAuth } from "react-oidc-context";
+import { gql } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 
-var CONSTANTS = {
+const CONSTANTS = {
     BACK_WALL_Z_OFFSET: -3.7,
     ROOM_Y: 7.4,
     ROOM_X_SCALE: 0.7,
@@ -28,6 +30,14 @@ var CONSTANTS = {
     FLOOR_SHELF_LOWER_BOTTOM: -3.2,
     WALL_DEPTH: 2,
 };
+
+const GET_USER_DATA = gql`
+{
+  user(id: "a72abad2-070c-454b-80ad-4c22b1535433") {
+    username
+    email
+  }
+}`;
 
 function WallsAndFloor() {
   const { viewport, size } = useThree();
@@ -77,7 +87,16 @@ function Scene() {
     return <div>Encountering error... {auth.error.message}</div>;
   }
 
-  if (auth.isAuthenticated) {
+  if (auth.isAuthenticated || true) {
+
+    const {data, error, loading} = useQuery(GET_USER_DATA);
+
+    if (loading) {
+      return <div>Loading...</div>
+    }
+
+    console.log(data);
+    
     // hard code for now but can be dynamic later if shelf size is dynamic
     const recordSquareCount = 42;
     const recordDiscCount = 3;

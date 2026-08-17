@@ -1,7 +1,6 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
 import Scene from './Scene.tsx'
-
+import {ApolloClient, HttpLink, InMemoryCache} from "@apollo/client"
+import {ApolloProvider} from "@apollo/client/react"
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { AuthProvider } from "react-oidc-context";
@@ -14,12 +13,21 @@ const cognitoAuthConfig = {
   scope: import.meta.env.VITE_COGNITO_SCOPE,
 };
 
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: new HttpLink({
+    uri: "http://localhost:8080/graphql",
+  }),
+});
+
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
 root.render(
   <React.StrictMode>
     <AuthProvider {...cognitoAuthConfig}>
-      <Scene />
+      <ApolloProvider client={client}>
+        <Scene />
+      </ApolloProvider>
     </AuthProvider>
   </React.StrictMode>
 );

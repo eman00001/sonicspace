@@ -6,9 +6,32 @@ type Query {
     track(id: ID!): Track
 }
 
+type Mutation {
+    createAlbum(title: String!, artist: String): Album!
+    updateAlbum(id: ID!, title: String, artist: String): Album!
+    deleteAlbum(id: ID!): Boolean!
+
+    createTrack(
+        albumId: ID!
+        title: String!
+        trackNo: Int
+        duration: Float
+    ): Track!
+
+    updateTrack(
+        id: ID!
+        title: String
+        trackNo: Int
+        duration: Float
+    ): Track!
+
+    deleteTrack(id: ID!): Boolean!
+}
+
 type User {
     id: ID!
     username: String!
+    email: String!
     createdAt: String!
     updatedAt: String!
 
@@ -35,7 +58,7 @@ type Track {
     albumId: ID!
 
     title: String!
-    trackNumber: Int
+    trackNo: Int
     duration: Float
 
     audioUrl: String
