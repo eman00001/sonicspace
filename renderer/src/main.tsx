@@ -4,6 +4,9 @@ import {ApolloProvider} from "@apollo/client/react"
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { AuthProvider } from "react-oidc-context";
+import App from './App.tsx';
+import { SetContextLink } from "@apollo/client/link/context";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 const cognitoAuthConfig = {
   authority: import.meta.env.VITE_COGNITO_AUTHORITY,
@@ -13,11 +16,24 @@ const cognitoAuthConfig = {
   scope: import.meta.env.VITE_COGNITO_SCOPE,
 };
 
+const authLink = new SetContextLink(async () => {
+  const session = await fetchAuthSession();
+
+  const accessToken = session.tokens?.accessToken?.toString();
+  // console.log("Access token:", accessToken);
+  return {
+    headers: {
+      Authorization: accessToken
+        ? `Bearer ${accessToken}`
+        : "",
+    },
+  };
+});
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: new HttpLink({
+  link: authLink.concat(new HttpLink({
     uri: "http://localhost:8080/graphql",
-  }),
+  })),
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
@@ -26,7 +42,7 @@ root.render(
   <React.StrictMode>
     <AuthProvider {...cognitoAuthConfig}>
       <ApolloProvider client={client}>
-        <Scene />
+        <App />
       </ApolloProvider>
     </AuthProvider>
   </React.StrictMode>

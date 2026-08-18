@@ -237,7 +237,6 @@ store_1 {
   position: absolute;
   left: 50%;
   bottom: 28px;
-  transform: translateX(-50%);
   z-index: 900; /* sit under overlay (overlay z-index:1000) */
   background: rgba(0,0,0,0.82);
   color: #ffffff;
@@ -250,8 +249,23 @@ store_1 {
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   backdrop-filter: blur(4px);
 }
-
-.add-songs-button:hover { transform: translateX(-50%) translateY(-3px); filter: brightness(1.05); }
+.sign-out-button {
+  position: absolute;
+  left: 10%;
+  bottom: 28px;
+  z-index: 900; /* sit under overlay (overlay z-index:1000) */
+  background: rgba(0,0,0,0.82);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+}
+.add-songs-button:hover { transform: translateY(-3px); filter: brightness(1.05); }
 
 .add-songs-modal {
   width: 420px;
