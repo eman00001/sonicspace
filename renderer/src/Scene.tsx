@@ -31,14 +31,6 @@ const CONSTANTS = {
     WALL_DEPTH: 2,
 };
 
-// const GET_USER_DATA = gql`
-// {
-//   user(id: "a72abad2-070c-454b-80ad-4c22b1535433") {
-//     username
-//     email
-//   }
-// }`;
-
 const GET_USER_DATA = gql`
   query GetMe {
     me {
