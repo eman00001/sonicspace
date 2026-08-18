@@ -39,30 +39,15 @@ const GET_USER_DATA = gql`
   }
 }`;
 
-const CREATE_MY_USER = gql`
-  mutation CreateMyUser($email: String!, $username: String!) {
-    createMyUser(email: $email, username: $username) {
-      id
-      username
-      email
-    }
-  }
-`;
 // const GET_USER_DATA = gql`
 //   query GetMe {
 //     me {
 //       id
 //       username
-//       email
 //     }
 //   }
 // `;
 
-async function getAttr() {
-  const attributes = await fetchUserAttributes();
-
-  console.log(attributes.email);
-}
 
 function WallsAndFloor() {
   const { viewport, size } = useThree();
