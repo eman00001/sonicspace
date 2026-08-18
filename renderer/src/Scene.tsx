@@ -31,22 +31,22 @@ const CONSTANTS = {
     WALL_DEPTH: 2,
 };
 
-const GET_USER_DATA = gql`
-{
-  user(id: "a72abad2-070c-454b-80ad-4c22b1535433") {
-    username
-    email
-  }
-}`;
-
 // const GET_USER_DATA = gql`
-//   query GetMe {
-//     me {
-//       id
-//       username
-//     }
+// {
+//   user(id: "a72abad2-070c-454b-80ad-4c22b1535433") {
+//     username
+//     email
 //   }
-// `;
+// }`;
+
+const GET_USER_DATA = gql`
+  query GetMe {
+    me {
+      id
+      username
+    }
+  }
+`;
 
 
 function WallsAndFloor() {
@@ -134,7 +134,7 @@ function Scene() {
   async function getAttr() {
     const attributes = await fetchUserAttributes();
 
-    console.log(attributes.email);
+    console.log(attributes);
   }
 
   getAttr();
